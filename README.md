@@ -11,6 +11,8 @@ The TurtleScript code for the above drawing.
 
 ---
 
+##Intro
+
 TurtleScript is a name that I just made up for a scripting language meant for controlling turtles (little nasties that algorithmically make a mess on the screen).
 
 The idea for this program came from a book called "The Pragmatic Programmer" by Andrew Hunt and David Thomas (page 63 exercise 5)
@@ -21,7 +23,11 @@ This program supports multiple colours(3!), navigation in 4(!) directions, and p
 
 ---
 
-Syntax:
+##Using TurtleScript
+
+Place your TurtleScriptFiles in the same directory as the main program. Upon execution, the program will ask you to input the name of a TurtleScriptFile. Once you have done so, the program will begin drawing your beautiful artistic masterpiece on the very screen before your eyes :D
+
+###Syntax:
 
 Most TurtleScript commands come in the form of an uppercase letter, followed by a space, followed by a number.
 Example: "N 12"
@@ -34,9 +40,11 @@ Example: "N 4 # this is a comment"
 
 The following TurtleScript code will draw a hollow square on screen.
 
-  P 0 # select red pen
-  D 	# pen down
-  W 5	# go left 5 positions
-  N 5	# go up 5 positions
-  E 5	# go right 5 positions
-  S 5	# go down 5 positions
+```
+P 0 # select red pen
+D 	# pen down
+W 5	# go left 5 positions
+N 5	# go up 5 positions
+E 5	# go right 5 positions
+S 5	# go down 5 positions
+```
