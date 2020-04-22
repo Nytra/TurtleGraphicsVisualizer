@@ -9,7 +9,9 @@ Just a demonstration of a turtle drawing my name onto the screen.
 
 The TurtleScript code for the above drawing.
 
-TurtleScript is a name that I just made up for a scripting language meant for controlling drawing turtles.
+---
+
+TurtleScript is a name that I just made up for a scripting language meant for controlling turtles (little nasties that algorithmically make a mess on the screen).
 
 The idea for this program came from a book called "The Pragmatic Programmer" by Andrew Hunt and David Thomas (page 63 exercise 5)
 
