@@ -46,8 +46,8 @@ The following TurtleScript code will draw a hollow square on screen.
 ```
 P 0 # select red pen
 D 	# pen down
-W 5	# go left 5 positions
-N 5	# go up 5 positions
-E 5	# go right 5 positions
-S 5	# go down 5 positions
+W 5	# go west (left) 5 positions
+N 5	# go north (up) 5 positions
+E 5	# go east (right) 5 positions
+S 5	# go south (down) 5 positions
 ```
