@@ -1,0 +1,45 @@
+P 2 # select pen 2
+D	# pen down
+W 2	# draw west 2cm
+N 1	# then north 1
+E 2	# then east 2
+S 1	# then back south
+U	# pen up
+W 5
+P 1
+D
+N 7
+E 5
+N 2
+U
+S 10
+P 0
+D
+W 2
+S 2
+E 2
+S 2
+W 2
+U
+E 4
+D
+N 2
+E 2
+S 2
+U
+N 1
+D
+W 1
+U
+E 3
+S 1
+D
+N 2
+E 2
+S 1
+U
+N 1
+E 1
+D
+E 1
+S 2
