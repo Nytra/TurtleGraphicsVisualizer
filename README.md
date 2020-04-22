@@ -3,7 +3,11 @@ A parser and renderer that reads TurtleScript commands from a TurtleScriptFile (
 
 ![demo](https://github.com/Nytra/TurtleScript/blob/master/demo1.gif)
 
+Just a demonstration of a turtle drawing my name onto the screen.
+
 ![demo](https://github.com/Nytra/TurtleScript/blob/master/yeah_it_supports_comments.PNG)
+
+The TurtleScript code for the above drawing.
 
 TurtleScript is a name that I just made up for a scripting language meant for controlling drawing turtles.
 
