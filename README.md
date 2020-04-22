@@ -11,7 +11,7 @@ The TurtleScript code for the above drawing.
 
 ---
 
-##Intro
+## Intro
 
 TurtleScript is a name that I just made up for a scripting language meant for controlling turtles (little nasties that algorithmically make a mess on the screen).
 
@@ -23,11 +23,11 @@ This program supports multiple colours(3!), navigation in 4(!) directions, and p
 
 ---
 
-##Using TurtleScript
+## Using TurtleScript
 
 Place your TurtleScriptFiles in the same directory as the main program. Upon execution, the program will ask you to input the name of a TurtleScriptFile. Once you have done so, the program will begin drawing your beautiful artistic masterpiece on the very screen before your eyes :D
 
-###Syntax:
+### Syntax:
 
 Most TurtleScript commands come in the form of an uppercase letter, followed by a space, followed by a number.
 Example: "N 12"
