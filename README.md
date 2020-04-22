@@ -30,13 +30,16 @@ Place your TurtleScriptFiles in the same directory as the main program. Upon exe
 ### Syntax:
 
 Most TurtleScript commands come in the form of an uppercase letter, followed by a space, followed by a number.
-Example: "N 12"
+
+Example: `"N 12"`
 
 Some commands do not take an argument, so for them you would just type the uppercase letter.
-Example: "D"
+
+Example: `"D"`
 
 The parser supports comments, but only at the end of the line.
-Example: "N 4 # this is a comment"
+
+Example: `"N 4 # this is a comment"`
 
 The following TurtleScript code will draw a hollow square on screen.
 
