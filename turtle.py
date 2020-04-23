@@ -157,7 +157,7 @@ def display():
     t.setSize(TURTLE_SIZE)
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
-    initialDelay = 10000 # 5 second delay when program starts before turtle starts performing actions
+    initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
     
     while not pygameQuit:
         for event in pygame.event.get():
@@ -202,12 +202,12 @@ TURTLE_ACTION_INTERVAL = 100 # time in ms between actions
 TURTLE_PEN_COLOURS = red, green, blue
 TURTLE_SIZE = 20
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
-
 clock = pygame.time.Clock()
 
-fileName = "sam.tsf"
+fileName = input("File name: ")
 t = TurtleScript(fileName)
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
 
 display()
 #t.perform()

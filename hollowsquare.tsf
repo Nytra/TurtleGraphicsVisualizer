@@ -1,0 +1,6 @@
+P 0 # select red pen
+D 	# pen down
+W 5	# go left 5 positions
+N 5	# go up 5 positions
+E 5	# go right 5 positions
+S 5	# go down 5 positions
