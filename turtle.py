@@ -233,9 +233,10 @@ class Turtle:
             
 
 def display():
-    FPS = 60
+    FPS = 24
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
+    hasDoneInitialPause = False
     #initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
     
     while not pygameQuit:
@@ -243,6 +244,10 @@ def display():
             if event.type == pygame.QUIT:
                 #pygame.quit()
                 pygameQuit = True
+
+        if pygame.time.get_ticks() - timerStart < 15000 and hasDoneInitialPause == False:
+            continue
+        hasDoneInitialPause = True
 
         screen.fill(BG_COLOUR)
 
@@ -335,6 +340,7 @@ while choice == None:
                 fileName = input("File name: ")
                 if not os.path.exists(fileName):
                     print("error: that file does not exist")
+                    fileName = None
             else:
                 turtles.append(Turtle(fileName))
         elif choice == 2:
