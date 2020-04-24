@@ -5,11 +5,11 @@ A parser and renderer that reads TurtleScript commands from a TurtleScript file 
 
 Just a demonstration of a turtle drawing my name onto the screen.
 
-![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/yeah_comments.PNG)
+![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/yeah_comments.png)
 
 The TurtleScript code for the above drawing.
 
-![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.PNG)
+![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.png)
 
 The program is capable of generating random TurtleScript files with a specified number of actions. The program ensures that the turtle does not leave the confines of the screen.
 
