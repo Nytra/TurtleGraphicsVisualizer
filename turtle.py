@@ -1,22 +1,38 @@
-import string, pygame, sys
+import string, pygame, sys, os, time, random
 from pygame.locals import *
 pygame.init()
 
-class TurtleScript:
+WHITE = 255, 255, 255
+GREY = 64, 64, 64
+BLACK = 0, 0, 0
+RED = 255, 0, 0
+GREEN = 0, 255, 0
+BLUE = 0, 0, 255
+BG_COLOUR = GREY
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+TURTLE_ACTION_INTERVAL = 0 # time in ms between actions
+TURTLE_PEN_COLOURS = RED, GREEN, BLUE
+TURTLE_SIZE_DEFAULT = 20
+TURTLE_MOVE_SPEED_DEFAULT = TURTLE_SIZE_DEFAULT
+TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
+
+class Turtle:
     
-    def __init__(self, path):
+    def __init__(self, path, pos=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2), size=TURTLE_SIZE_DEFAULT, speed=TURTLE_MOVE_SPEED_DEFAULT):
         self.path = path
         self.actions = []
         self.actionPtr = 0
-        self.x = 0
-        self.y = 0
-        self.size = 1
+        self.x = pos[0]
+        self.y = pos[1]
+        self.size = size
+        self.moveSpeed = speed
         self.penDown = False
         self.penPtr = 0 # pen 1 = red, pen 2 = green, pen 3 = blue
         self.memory = []
         self.target = (0, 0)
-        #self.readNext = True
-        self.actionPtrPrev = -1
+        self.hasDoneCurrentAction = False
 
         self.readScript(path)
 
@@ -26,6 +42,15 @@ class TurtleScript:
 
     def setSize(self, size):
         self.size = size
+
+    def setSpeed(self, speed):
+        self.moveSpeed = speed
+
+    def getSpeed(self):
+        return self.moveSpeed
+
+    def getSize(self):
+        return self.size
 
     def getX(self):
         return self.x
@@ -82,13 +107,25 @@ class TurtleScript:
             self.actions.append(parts)
         #print(self.actions)
         #input()
+    
+    def remember(self, data):
+        exists = False
+
+        for i in range(len(self.memory)):
+            if self.memory[i][0] == data[0] and self.memory[i][1] == data[1]:
+                exists = True
+                self.memory[i][2] = data[2]
+                break
+
+        if not exists:
+            self.memory.append(data)
 
     def doNext(self):
         
         if self.actionPtr < len(self.actions):
-            if self.actionPtrPrev != self.actionPtr:
-                #readNext = False
-                self.actionPtrPrev = self.actionPtr
+            if self.hasDoneCurrentAction == False:
+                self.hasDoneCurrentAction = True
+                #self.actionPtrPrev = self.actionPtr
                 action = self.actions[self.actionPtr]
                 command = action[0]
                 if len(action) > 1:
@@ -103,7 +140,7 @@ class TurtleScript:
                     self.penDown = True
                     # need to add this point to memory because my program design is flawed :)
                     # it makes sense to "mark the paper" when the pen goes down anyway
-                    self.memory.append((self.x, self.y, self.penPtr))
+                    self.remember([self.x, self.y, self.penPtr])
                 elif command == "U":
                     self.penDown = False
                 elif command == "N":
@@ -119,7 +156,8 @@ class TurtleScript:
 
                 if self.target == None:
                     self.actionPtr += 1
-                    #self.readNext = True
+                    self.hasDoneCurrentAction = False
+                    self.doNext() # experiment
                                    
             else:
                 # go straight to the next point if pen is up
@@ -131,83 +169,114 @@ class TurtleScript:
                     if abs(self.x - self.target[0]) >= abs(self.y - self.target[1]):
                         # move x
                         if self.target[0] > self.x:
-                            self.x += 1 * self.size
+                            self.x += 1 * self.moveSpeed
                         elif self.target[0] < self.x:
-                            self.x -= 1 * self.size
+                            self.x -= 1 * self.moveSpeed
                     else:
                         # move y
                         if self.target[1] > self.y:
-                            self.y += 1 * self.size
+                            self.y += 1 * self.moveSpeed
                         elif self.target[1] < self.y:
-                            self.y -= 1 * self.size
+                            self.y -= 1 * self.moveSpeed
+
+                offScreen = False
+                if self.x < 0:
+                    self.x = 0
+                    offScreen = True
+                elif self.x > SCREEN_WIDTH - self.size:
+                    self.x = SCREEN_WIDTH - self.size
+                    offScreen = True
+
+                if self.y < 0:
+                    self.y = 0
+                    offScreen = True
+                elif self.y > SCREEN_HEIGHT - self.size:
+                    self.y = SCREEN_HEIGHT - self.size
+                    offScreen = True
+                
+                if offScreen:
+                    self.actionPtr += 1
+                    self.hasDoneCurrentAction = False
+                    self.doNext()
 
                 #print(self.x, self.y)
                         
                 if self.penDown:
-                    self.memory.append((self.x, self.y, self.penPtr))
+                    self.remember([self.x, self.y, self.penPtr])
                     
                 if (self.x, self.y) == self.target:
-                    #self.readNext = True
                     self.actionPtr += 1
+                    self.hasDoneCurrentAction = False
+                    self.doNext()
             
 
 def display():
-    FPS = 60
-    t.setPos(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-    t.setSize(TURTLE_SIZE)
+    FPS = 999
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
-    initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
+    #initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
     
     while not pygameQuit:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                #pygame.quit()
+                pygameQuit = True
 
-        screen.fill(bgColour)
+        screen.fill(BG_COLOUR)
 
         # logic here
-        if initialDelay != None and pygame.time.get_ticks() - timerStart < initialDelay:
-            pass
-        else:
-            initialDelay = None
-            if pygame.time.get_ticks() - timerStart > TURTLE_ACTION_INTERVAL:
-                timerStart = pygame.time.get_ticks()
+        if pygame.time.get_ticks() - timerStart > TURTLE_ACTION_INTERVAL:
+            timerStart = pygame.time.get_ticks()
+            for t in turtles:
                 t.doNext()
 
-        for element in t.memory:
-            pygame.draw.rect(screen, TURTLE_PEN_COLOURS[element[2]], (element[0], element[1], TURTLE_SIZE, TURTLE_SIZE))
+        for t in turtles:
+            for element in t.memory:
+                pygame.draw.rect(screen, TURTLE_PEN_COLOURS[element[2]], (element[0], element[1], t.getSize(), t.getSize()))
         
         pygame.display.update()
 
         clock.tick(FPS)
 
+    pygame.quit()
 
-white = 255, 255, 255
-grey = 64, 64, 64
-black = 0, 0, 0
-red = 255, 0, 0
-green = 0, 255, 0
-blue = 0, 0, 255
-bgColour = grey
+def _generateTurtleScriptFile(numActions):
+    fileName = "gen" + str(int(time.time())) + ".tsf"
+    with open(fileName, "w") as f:
+        f.write("D\n")
+        f.write("P 0\n")
+        for i in range(numActions):
+            command = random.choice(["N", "E", "S", "W", "P"])
+            if command == "P":
+                value = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+            else:
+                value = random.randint(1, 10)
+            f.write(command + " " + str(value) + "\n")
+        f.close()
+    return fileName
 
 pygame.display.set_caption("TurtleScript Drawing Program")
 
 flags = HWSURFACE | DOUBLEBUF
 bpp = 16
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-TURTLE_ACTION_INTERVAL = 100 # time in ms between actions
-TURTLE_PEN_COLOURS = red, green, blue
-TURTLE_SIZE = 20
 
 clock = pygame.time.Clock()
 
-fileName = input("File name: ")
-t = TurtleScript(fileName)
+turtles = []
+
+genFile = _generateTurtleScriptFile(1000)
+
+if TURTLE_PERFORM_CURRENT_DIRECTORY == False:
+    fileName = input("File name: ")
+    turtles.append(Turtle(fileName))
+else:
+    fileNames = os.listdir(os.path.abspath(""))
+    for fileName in fileNames:
+        if fileName.endswith(".tsf"): turtles.append(Turtle(fileName))
+
+if genFile:
+    turtles = [Turtle(genFile),]
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
 
 display()
-#t.perform()
