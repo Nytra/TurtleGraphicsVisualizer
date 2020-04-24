@@ -17,10 +17,11 @@ TURTLE_PEN_COLOURS = RED, GREEN, BLUE
 TURTLE_SIZE_DEFAULT = 20
 TURTLE_MOVE_SPEED_DEFAULT = TURTLE_SIZE_DEFAULT
 TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
+TURTLE_RANDOM_DIST_MAX = 10
 
 class Turtle:
     
-    def __init__(self, path, pos=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2), size=TURTLE_SIZE_DEFAULT, speed=TURTLE_MOVE_SPEED_DEFAULT):
+    def __init__(self, path=None, pos=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2), size=TURTLE_SIZE_DEFAULT, speed=TURTLE_MOVE_SPEED_DEFAULT):
         self.path = path
         self.actions = []
         self.actionPtr = 0
@@ -34,7 +35,12 @@ class Turtle:
         self.target = (0, 0)
         self.hasDoneCurrentAction = False
 
-        self.readScript(path)
+        if self.path != None:
+            self.readScript(path)
+            self.performRandom = False
+        else:
+            self.penDown = True
+            self.performRandom = True
 
     def setPos(self, x, y):
         self.x = x
@@ -114,7 +120,16 @@ class Turtle:
         for i in range(len(screenBuffer)):
             if screenBuffer[i][0] == data[0] and screenBuffer[i][1] == data[1]:
                 exists = True
-                screenBuffer[i][2] = data[2]
+                if screenBuffer[i][2] == data[2]:
+                    # if the turtle is the same colour as the screen cell it occupies
+                    # change the colour to something else
+                    # (this way we don't lose track of where the turtle is)
+                    temp = self.penPtr
+                    while self.penPtr == temp:
+                        self.penPtr = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                    screenBuffer[i][2] = self.penPtr
+                else:
+                    screenBuffer[i][2] = data[2]
                 break
 
         if not exists:
@@ -122,15 +137,22 @@ class Turtle:
 
     def doNext(self):
         
-        if self.actionPtr < len(self.actions):
+        if self.actionPtr < len(self.actions) or self.performRandom == True:
             if self.hasDoneCurrentAction == False:
                 self.hasDoneCurrentAction = True
                 #self.actionPtrPrev = self.actionPtr
-                action = self.actions[self.actionPtr]
+                if self.performRandom:
+                    action = [random.choice(["P", "N", "E", "S", "W"]), None]
+                    if action[0] == "P":
+                        action[1] = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                    else:
+                        action[1] = random.randint(0, TURTLE_RANDOM_DIST_MAX)
+                else:
+                    action = self.actions[self.actionPtr]
                 command = action[0]
                 if len(action) > 1:
                     value = int(action[1])
-                print(action)
+                #print(action)
 
                 self.target = None
                     
@@ -211,7 +233,7 @@ class Turtle:
             
 
 def display():
-    FPS = 999
+    FPS = 60
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
     #initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
@@ -250,7 +272,7 @@ def _generateTurtleScriptFile(numActions):
             if command == "P":
                 value = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
             else:
-                value = random.randint(1, 10)
+                value = random.randint(0, TURTLE_RANDOM_DIST_MAX)
             f.write(command + " " + str(value) + "\n")
         f.close()
     return fileName
@@ -286,17 +308,23 @@ clock = pygame.time.Clock()
 
 turtles = []
 screenBuffer = []
+options = [
+    "Perform a specific TurtleScript file",
+    "Perform all TurtleScript files in the current directory (simultaneously)",
+    "Generate a random TurtleScript file",
+    "Endless random Turtle"
+]
 
 choice = None
 print("Welcome to TurtleScript Drawing Program!")
 print("\nWhat would you like to do?")
-print("1) Perform a specific TurtleScript file")
-print("2) Perform all TurtleScript files in the current directory (simultaneously)")
-print("3) Generate a random TurtleScript file")
+for i in range(len(options)):
+    print(i+1, ")", options[i])
+
 while choice == None:
     choice = waitForValidIntInput("Choose an option: ")
         
-    if choice != None and choice in (1,2,3):
+    if choice != None and choice in list(range(1, len(options) + 1)):
         if choice == 1:
             print("\nAvailable TurtleScript files:")
             for fileName in os.listdir(os.path.abspath("")):
@@ -321,6 +349,8 @@ while choice == None:
             else:
                 genFile = _generateTurtleScriptFile(numActions)
                 turtles = [Turtle(genFile),]
+        elif choice == 4:
+            turtles = [Turtle(), ]
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
 
