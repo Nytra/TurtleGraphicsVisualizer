@@ -1,17 +1,21 @@
 # TurtleScript
 A parser and renderer that reads TurtleScript commands from a TurtleScript file (.tsf) and then performs the specified actions on screen.
 
-![demo](https://github.com/Nytra/TurtleScript/blob/master/demo1.gif)
+![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/demo1.gif)
 
 Just a demonstration of a turtle drawing my name onto the screen.
 
-![demo](https://github.com/Nytra/TurtleScript/blob/master/yeah_it_supports_comments.PNG)
+![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/yeah_comments.PNG)
 
 The TurtleScript code for the above drawing.
 
-![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/random.PNG)
+![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.PNG)
 
 The program is capable of generating random TurtleScript files with a specified number of actions. The program ensures that the turtle does not leave the confines of the screen.
+
+![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/demo2.gif)
+
+Endless random mode!
 
 ---
 
@@ -30,6 +34,11 @@ This program supports multiple colours(3!), navigation in 4(!) directions, and p
 ## Using TurtleScript
 
 Place your TurtleScript files in the same directory as the main program. Upon execution, the program will ask you to input the name of a TurtleScript file. Once you have done so, the program will begin drawing your beautiful artistic masterpiece on the very screen before your eyes :D
+
+There are also other modes to choose from, such as:
+- Perform all TurtleScript files in the current directory simultaneously
+- Save a new finite and random TurtleScript file (of user-specified length) in the current directory and then perform it
+- Endless random mode!
 
 ### Syntax:
 
