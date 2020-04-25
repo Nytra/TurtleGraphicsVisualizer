@@ -54,13 +54,18 @@ The parser supports comments, but only at the end of the line.
 
 Example: `"N 4 # this is a comment"`
 
+The `"P"` command sets the colour, and takes a value in the range 0 through 2. This corresponds to Red, Green or Blue. 
+
 The following TurtleScript code will draw a hollow square on screen.
 
 ```
-P 0 # select red pen
-D 	# pen down
-W 5	# go west (left) 5 positions
-N 5	# go north (up) 5 positions
-E 5	# go east (right) 5 positions
-S 5	# go south (down) 5 positions
+# start of file
+P 0    # select red pen
+D      # pen down
+W 5    # go west (left) 5 positions
+N 5    # go north (up) 5 positions
+E 5    # go east (right) 5 positions
+S 5    # go south (down) 5 positions
+U      # pen up
+# end of file
 ```
