@@ -1,5 +1,5 @@
 # TurtleScript
-A parser and renderer that reads TurtleScript commands from a TurtleScript file (.tsf) and then performs the specified actions on screen.
+A parser and renderer that reads TurtleScript commands from a TurtleScript file (.tsf) and then performs the specified actions on screen. Requires PyGame.
 
 ![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/demo1.gif)
 
