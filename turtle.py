@@ -243,7 +243,6 @@ class Turtle:
             
 
 def display():
-    FPS = 24
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
     hasDoneInitialPause = True
@@ -273,7 +272,7 @@ def display():
 
         pygame.display.update()
 
-        clock.tick(FPS)
+        clock.tick(frameRate)
 
     pygame.quit()
     #screen.quit()
@@ -321,6 +320,7 @@ flags = HWSURFACE | DOUBLEBUF
 bpp = 16
 
 clock = pygame.time.Clock()
+frameRate = 120
 
 turtles = []
 screenBuffer = []
@@ -328,19 +328,23 @@ options = [
     "Perform a specific TurtleScript file",
     "Perform all TurtleScript files in the current directory (simultaneously)",
     "Generate a random TurtleScript file",
-    "Endless random Turtle",
+    "Endless random turtle",
+    "Set frame-rate",
+    "Set turtle size",
     "Quit"
 ]
 
 screen = None
 choice = None
 quitGame = False
+start = False
 print("Welcome to TurtleScript Drawing Program!")
 print("\nWhat would you like to do?")
 for i in range(len(options)):
     print(i+1, ")", options[i])
 
 while not quitGame:
+    start = True
     choice = waitForValidIntInput("Choose an option: ")
         
     if choice != None and choice in list(range(1, len(options) + 1)):
@@ -355,13 +359,15 @@ while not quitGame:
                 if not os.path.exists(fileName):
                     print("error: that file does not exist")
                     fileName = None
-            else:
-                turtles.append(Turtle(fileName))
+                else:
+                    turtles.append(Turtle(fileName))
+
         elif choice == 2:
             fileNames = os.listdir(os.path.abspath(""))
             for fileName in fileNames:
                 if fileName.endswith(".tsf"): 
                     turtles.append(Turtle(fileName))
+
         elif choice == 3:
             numActions = waitForValidIntInput("How many actions?: ")
             if numActions <= 0:
@@ -369,6 +375,7 @@ while not quitGame:
             else:
                 genFile = _generateTurtleScriptFile(numActions)
                 turtles = [Turtle(genFile),]
+
         elif choice == 4:
             turtles = [Turtle(), ]
             changeColourOnCollision = None
@@ -389,11 +396,20 @@ while not quitGame:
                         turtles[0].changeColourOnCollisionMode = mode
 
         elif choice == 5:
+            # set fps
+            frameRate = waitForValidIntInput("Frame-rate: ", forcePositive=True)
+            start = False
+        elif choice == 6:
+            # set size
+            TURTLE_SIZE_DEFAULT = waitForValidIntInput("Turtle size: ", forcePositive=True)
+            #TURTLE_MOVE_SPEED_DEFAULT = TURTLE_SIZE_DEFAULT
+            start = False
+        elif choice == 7:
             pygame.quit()
             #sys.exit()
             quitGame = True
     
-    if not quitGame:
+    if not quitGame and start == True:
         pygame.init()
         pygame.display.set_caption("TurtleScript Drawing Program")
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
