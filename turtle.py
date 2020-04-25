@@ -34,6 +34,7 @@ class Turtle:
         #self.memory = []
         self.target = (0, 0)
         self.hasDoneCurrentAction = False
+        self.changeColourOnCollisionMode = 0 # 0 = off, 1 = when crossing same colour, 2 = when crossing any colour
 
         if self.path != None:
             self.readScript(path)
@@ -109,8 +110,9 @@ class Turtle:
                         break
                     except ValueError:
                         pass
-                
-            self.actions.append(parts)
+            
+            if parts:
+                self.actions.append(parts)
         #print(self.actions)
         #input()
     
@@ -120,13 +122,20 @@ class Turtle:
         for i in range(len(screenBuffer)):
             if screenBuffer[i][0] == data[0] and screenBuffer[i][1] == data[1]:
                 exists = True
-                if screenBuffer[i][2] == data[2]:
+                if screenBuffer[i][2] == data[2] and self.changeColourOnCollisionMode == 1:
                     # if the turtle is the same colour as the screen cell it occupies
                     # change the colour to something else
                     # (this way we don't lose track of where the turtle is)
-                    temp = self.penPtr
-                    while self.penPtr == temp:
-                        self.penPtr = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                    #temp = self.penPtr
+                    self.penPtr = random.choice(list(n for n in range(0, len(TURTLE_PEN_COLOURS)) if n != self.penPtr))
+                    #while self.penPtr == temp:
+                        #self.penPtr = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                    screenBuffer[i][2] = self.penPtr
+                elif self.changeColourOnCollisionMode == 2:
+                    #temp = self.penPtr
+                    #while self.penPtr == temp:
+                        #self.penPtr = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                    self.penPtr = random.choice(list(n for n in range(0, len(TURTLE_PEN_COLOURS)) if n != self.penPtr))
                     screenBuffer[i][2] = self.penPtr
                 else:
                     screenBuffer[i][2] = data[2]
@@ -149,6 +158,7 @@ class Turtle:
                         action[1] = random.randint(0, TURTLE_RANDOM_DIST_MAX)
                 else:
                     action = self.actions[self.actionPtr]
+                #print(action)
                 command = action[0]
                 if len(action) > 1:
                     value = int(action[1])
@@ -361,6 +371,23 @@ while not quitGame:
                 turtles = [Turtle(genFile),]
         elif choice == 4:
             turtles = [Turtle(), ]
+            changeColourOnCollision = None
+            while changeColourOnCollision == None:
+                changeColourOnCollision = input("Would you like the turtle to change colour when passing over its trail? [Y/n]: ")
+                if changeColourOnCollision.lower() not in ("y", "n"):
+                    print("error: please type 'y' or 'n'")
+                    changeColourOnCollision = None
+            if changeColourOnCollision.lower() == "y":
+                #turtles[0].changeColourOnCollisionMode = 0
+                mode = None
+                while mode == None:
+                    mode = waitForValidIntInput("Mode? [1: same colour] or [2: any colour]: ")
+                    if mode not in (1, 2):
+                        print("error: not an option")
+                        mode = None
+                    else:
+                        turtles[0].changeColourOnCollisionMode = mode
+
         elif choice == 5:
             pygame.quit()
             #sys.exit()
