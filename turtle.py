@@ -269,6 +269,7 @@ def display():
         #for t in turtles:
         for element in screenBuffer:
             pygame.draw.rect(screen, TURTLE_PEN_COLOURS[element[2]], (element[0], element[1], TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
+            #pygame.draw.circle(screen, TURTLE_PEN_COLOURS[element[2]], (element[0], element[1]), TURTLE_SIZE_DEFAULT)
 
         pygame.display.update()
 
