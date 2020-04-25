@@ -1,6 +1,6 @@
 import string, pygame, sys, os, time, random
 from pygame.locals import *
-pygame.init()
+#pygame.init()
 
 WHITE = 255, 255, 255
 GREY = 64, 64, 64
@@ -14,7 +14,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 TURTLE_ACTION_INTERVAL = 0 # time in ms between actions
 TURTLE_PEN_COLOURS = RED, GREEN, BLUE
-TURTLE_SIZE_DEFAULT = 20
+TURTLE_SIZE_DEFAULT = 10
 TURTLE_MOVE_SPEED_DEFAULT = TURTLE_SIZE_DEFAULT
 TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
 TURTLE_RANDOM_DIST_MAX = 10
@@ -236,7 +236,7 @@ def display():
     FPS = 24
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
-    hasDoneInitialPause = False
+    hasDoneInitialPause = True
     #initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
     
     while not pygameQuit:
@@ -266,6 +266,8 @@ def display():
         clock.tick(FPS)
 
     pygame.quit()
+    #screen.quit()
+    #screen.close()
 
 def _generateTurtleScriptFile(numActions):
     fileName = "gen" + str(int(time.time())) + ".tsf"
@@ -304,7 +306,6 @@ def waitForValidFileName():
             print("error: that file does not exist in the current directory")
     return inp
 
-pygame.display.set_caption("TurtleScript Drawing Program")
 
 flags = HWSURFACE | DOUBLEBUF
 bpp = 16
@@ -317,16 +318,19 @@ options = [
     "Perform a specific TurtleScript file",
     "Perform all TurtleScript files in the current directory (simultaneously)",
     "Generate a random TurtleScript file",
-    "Endless random Turtle"
+    "Endless random Turtle",
+    "Quit"
 ]
 
+screen = None
 choice = None
+quitGame = False
 print("Welcome to TurtleScript Drawing Program!")
 print("\nWhat would you like to do?")
 for i in range(len(options)):
     print(i+1, ")", options[i])
 
-while choice == None:
+while not quitGame:
     choice = waitForValidIntInput("Choose an option: ")
         
     if choice != None and choice in list(range(1, len(options) + 1)):
@@ -357,7 +361,15 @@ while choice == None:
                 turtles = [Turtle(genFile),]
         elif choice == 4:
             turtles = [Turtle(), ]
+        elif choice == 5:
+            pygame.quit()
+            #sys.exit()
+            quitGame = True
+    
+    if not quitGame:
+        pygame.init()
+        pygame.display.set_caption("TurtleScript Drawing Program")
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
+        screenBuffer = []
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags, bpp)
-
-display()
+        display()
