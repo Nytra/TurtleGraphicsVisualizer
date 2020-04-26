@@ -30,7 +30,7 @@ TURTLE_USES_FULL_DIRECTION_RANGE = True
 TURTLE_NO_TRAIL = False
 RENDER_STATIC = True # don't clear the screen every frame, don't fill the screen every frame, only draw when needed
 RENDER_STATIC_CLEAR_INTERVAL = 1000 # MS
-RENDER_STATIC_DOES_CLEAR = True # Clear screen on intervals to limit trail length
+RENDER_STATIC_DOES_CLEAR = False # Clear screen on intervals to limit trail length
 NORTH_ANGLE = 0
 TO_RAD = 3.14 / 180.0
 
