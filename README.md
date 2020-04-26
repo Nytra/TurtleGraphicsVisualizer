@@ -1,13 +1,9 @@
 # TurtleScript
 A parser and renderer that reads TurtleScript commands from a TurtleScript file (.tsf) and then performs the specified actions on screen. Requires PyGame.
 
-![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/demo1.gif)
+![Insanity](https://github.com/Nytra/TurtleScript/blob/master/assets/demo3.gif)
 
-Just a demonstration of a turtle drawing my name onto the screen.
-
-![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/yeah_comments.png)
-
-The TurtleScript code for the above drawing.
+Massively optimized rendering to support 1000 unique turtles moving on the screen at once!
 
 ![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.png)
 
@@ -16,6 +12,14 @@ The program is capable of generating random TurtleScript files with a specified 
 ![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/demo2.gif)
 
 Endless random mode!
+
+![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/demo1.gif)
+
+Just a demonstration of a turtle drawing my name onto the screen.
+
+![demo](https://github.com/Nytra/TurtleScript/blob/master/assets/yeah_comments.png)
+
+The TurtleScript code for the above drawing.
 
 ---
 
@@ -27,7 +31,7 @@ The idea for this program came from a book called "The Pragmatic Programmer" by 
 
 The exercise just states that you must implement a *parser* for the scripting language- but, of course, I couldn't just stop there. 
 
-This program supports multiple colours(3!), navigation in 4(!) directions, and pen up/down commands. You could draw anything from your wildest imagination.
+This program supports ~~3 colours~~ FULL COLOUR RANGE, navigation in ~~4~~ FULL 360 DEGREES ~~directions~~, and pen up/down commands. You could draw anything from your wildest imagination.
 
 ---
 
@@ -39,6 +43,10 @@ There are also other modes to choose from, such as:
 - Perform all TurtleScript files in the current directory simultaneously
 - Save a new finite and random TurtleScript file (of user-specified length) in the current directory and then perform it
 - Endless random mode!
+
+### Key Bindings
+
+`P` : Clear the screen
 
 ### Syntax:
 
