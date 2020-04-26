@@ -167,7 +167,8 @@ class Turtle:
         colour = data[2]
 
         if RENDER_STATIC:
-            pygame.draw.rect(screen, colour, (x * TURTLE_SIZE_DEFAULT, y * TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
+            if screen.get_at((x * TURTLE_SIZE_DEFAULT, y * TURTLE_SIZE_DEFAULT)) != colour:
+                pygame.draw.rect(screen, colour, (x * TURTLE_SIZE_DEFAULT, y * TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
             #pygame.display.update()
             return
 
