@@ -22,11 +22,12 @@ TURTLE_ACTION_INTERVAL = 0 # time in ms between actions
 TURTLE_PEN_COLOURS = RED, GREEN, BLUE
 TURTLE_SIZE_DEFAULT = 10
 TURTLE_MOVE_SPEED_DEFAULT = 1
-TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
+#TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
 TURTLE_RANDOM_DIST_MAX = 10
 TURTLE_CAN_OVERLAP_TRAIL = True
 TURTLE_USES_FULL_COLOUR_RANGE = True
-TURTLE_USES_FULL_DIRECTION_RANGE = True
+TURTLE_USES_FULL_DIRECTION_RANGE = False
+TURTLE_GO_DIAGONAL = False
 TURTLE_NO_TRAIL = False
 RENDER_STATIC = True # don't clear the screen every frame, don't fill the screen every frame, only draw when needed
 RENDER_STATIC_CLEAR_INTERVAL = 1000 # MS
@@ -47,6 +48,7 @@ TO_RAD = 3.14 / 180.0
 # use to visualise math formulas, fractals maybe
 # how to take direction? as new rotation command? NESW not super diverse
 # add option to not go back on itself (in random mode)
+# limit trail length
 
 class Turtle:
     
@@ -238,7 +240,10 @@ class Turtle:
                 self.hasDoneCurrentAction = True
                 #self.actionPtrPrev = self.actionPtr
                 if self.performRandom:
-                    action = [random.choice(["P", "N", "E", "S", "W", "NE", "SE", "SW", "NW"]), None]
+                    if TURTLE_GO_DIAGONAL:
+                        action = [random.choice(["P", "N", "E", "S", "W", "NE", "SE", "SW", "NW"]), None]
+                    else:
+                        action = [random.choice(["P", "N", "E", "S", "W"]), None]
                     if action[0] == "P":
                         if TURTLE_USES_FULL_COLOUR_RANGE:
                             action[1] = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
