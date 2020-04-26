@@ -29,6 +29,8 @@ TURTLE_USES_FULL_COLOUR_RANGE = True
 TURTLE_USES_FULL_DIRECTION_RANGE = True
 TURTLE_NO_TRAIL = False
 RENDER_STATIC = True # don't clear the screen every frame, don't fill the screen every frame, only draw when needed
+RENDER_STATIC_CLEAR_INTERVAL = 1000 # MS
+RENDER_STATIC_DOES_CLEAR = True # Clear screen on intervals to limit trail length
 NORTH_ANGLE = 0
 TO_RAD = 3.14 / 180.0
 
@@ -421,6 +423,7 @@ def display():
     pygameQuit = False
     timerStart = pygame.time.get_ticks()
     hasDoneInitialPause = True
+    clearTimer = pygame.time.get_ticks()
     #initialDelay = 1000 # specify delay to add when program starts. before turtle starts performing actions
     #frameTime = 0
 
@@ -452,7 +455,9 @@ def display():
         hasDoneInitialPause = True
 
         # maybe don't clear the screen to get better performance?
-        if not RENDER_STATIC:
+        if not RENDER_STATIC or (RENDER_STATIC and RENDER_STATIC_DOES_CLEAR and\
+             (pygame.time.get_ticks() - clearTimer) > RENDER_STATIC_CLEAR_INTERVAL):
+            clearTimer = pygame.time.get_ticks()
             screen.fill(BG_COLOUR)
 
         # logic here
@@ -482,6 +487,8 @@ def display():
         clock.tick(frameRate)
         frameEnd = pygame.time.get_ticks()
         frameTime = frameEnd - frameStart
+        if frameTime == 0:
+            frameTime = 1
         pygame.display.set_caption("FrameTime: " + str(frameTime) + " FPS: " + str(int(1000 / frameTime)))
 
 
