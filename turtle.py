@@ -124,6 +124,8 @@ class Turtle:
             parts = []
 
             ptr = -1
+            multipleParameters = False
+            parameterRead = False
             for i in range(len(line)):
                 if line[i] in string.ascii_letters:
                     parts.append(line[i])
@@ -135,6 +137,8 @@ class Turtle:
                     try:
                         int(line[i])
                         ptr = i
+                        if parameterRead:
+                            multipleParameters = True
                     except ValueError:
                         pass
                 else:
@@ -143,21 +147,29 @@ class Turtle:
                     except ValueError:
                         # we have gone by the number part
                         parts.append(line[ptr:i])
-                        break
+                        ptr = -1
+                        parameterRead = True
+                        #break
 
                 if i == len(line) - 1:
                     try:
                         int(line[i])
                         # last element is number
                         parts.append(line[ptr:i+1])
+                        if parameterRead:
+                            multipleParameters = True
                         break
                     except ValueError:
                         pass
             
             if parts:
+                if multipleParameters:
+                    params = tuple(int(n) for n in parts[1:])
+                    parts = parts[0], params
+                    
+                    self.actions.append(parts)
+
                 self.actions.append(parts)
-        #print(self.actions)
-        #input()
     
     def remember(self, data):
         exists = False
@@ -249,6 +261,7 @@ class Turtle:
                 self.direction = None
                     
                 if command == "P":
+                    #print(value)
                     if TURTLE_USES_FULL_COLOUR_RANGE:
                         self.rgb = value
                     else:
@@ -498,6 +511,9 @@ def display():
     #screen.quit()
     #screen.close()
 
+def getRandomColour():
+    return random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+
 def _generateTurtleScriptFile(numActions):
     fileName = "gen" + str(int(time.time())) + ".tsf"
     with open(fileName, "w") as f:
@@ -506,10 +522,17 @@ def _generateTurtleScriptFile(numActions):
         for i in range(numActions):
             command = random.choice(["N", "E", "S", "W", "P"])
             if command == "P":
-                value = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                if TURTLE_USES_FULL_COLOUR_RANGE:
+                    value = getRandomColour()
+                else:
+                    value = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
             else:
                 value = random.randint(0, TURTLE_RANDOM_DIST_MAX)
-            f.write(command + " " + str(value) + "\n")
+            if isinstance(value, tuple):
+                f.write(command + " " + " ".join(str(n) for n in value) + "\n")
+                #print(" ".join(str(n) for n in value))
+            else:
+                f.write(command + " " + str(value) + "\n")
         f.close()
     return fileName
 
