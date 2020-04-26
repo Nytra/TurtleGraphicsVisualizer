@@ -1,4 +1,10 @@
-import string, pygame, sys, os, time, random
+import string
+import pygame
+import sys
+import os
+import time
+import random
+import math
 from pygame.locals import *
 #pygame.init()
 
@@ -15,26 +21,46 @@ SCREEN_HEIGHT = 600
 TURTLE_ACTION_INTERVAL = 0 # time in ms between actions
 TURTLE_PEN_COLOURS = RED, GREEN, BLUE
 TURTLE_SIZE_DEFAULT = 10
-TURTLE_MOVE_SPEED_DEFAULT = TURTLE_SIZE_DEFAULT
+TURTLE_MOVE_SPEED_DEFAULT = 10
 TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
 TURTLE_RANDOM_DIST_MAX = 10
+TURTLE_CAN_OVERLAP_TRAIL = False
+TURTLE_USES_FULL_COLOUR_RANGE = True
+NORTH_ANGLE = 0
+TO_RAD = 3.14 / 180.0
+
+# ToDo:
+# Give turtle more directions to travel in. Probably best to give 360 degree freedom and limit from there.
+# ^DONE
+# Give turtle more colours.
+# ^DONE
+# Better turtle grid alignment
+# ^DONE
+# User input for control (WASD and script-based)
+# Snake game type?
+# pathing (can't cross its own trail)
+# use to visualise math formulas, fractals maybe
+# how to take direction? as new rotation command? NESW not super diverse
+# add option to not go back on itself (in random mode)
 
 class Turtle:
     
-    def __init__(self, path=None, pos=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2), size=TURTLE_SIZE_DEFAULT, speed=TURTLE_MOVE_SPEED_DEFAULT):
+    def __init__(self, path=None):
         self.path = path
         self.actions = []
         self.actionPtr = 0
-        self.x = pos[0]
-        self.y = pos[1]
-        self.size = size
-        self.moveSpeed = speed
+        self.x = SCREEN_WIDTH//2
+        self.y = SCREEN_HEIGHT//2
+        self.size = TURTLE_SIZE_DEFAULT
+        self.moveSpeed = TURTLE_MOVE_SPEED_DEFAULT
         self.penDown = False
         self.penPtr = 0 # pen 1 = red, pen 2 = green, pen 3 = blue
+        self.rgb = TURTLE_PEN_COLOURS[self.penPtr]
         #self.memory = []
         self.target = (0, 0)
         self.hasDoneCurrentAction = False
         self.changeColourOnCollisionMode = 0 # 0 = off, 1 = when crossing same colour, 2 = when crossing any colour
+        self.currentDirection = 0 # 360 deg value
 
         if self.path != None:
             self.readScript(path)
@@ -52,6 +78,15 @@ class Turtle:
 
     def setSpeed(self, speed):
         self.moveSpeed = speed
+
+    def setColour(self, color):
+        self.rgb = color
+
+    def setPenPtr(self, ptr):
+        self.penPtr = ptr
+
+    def setColorRGB(self, r, g, b):
+        self.rgb = r, g, b
 
     def getSpeed(self):
         return self.moveSpeed
@@ -128,15 +163,19 @@ class Turtle:
                     # (this way we don't lose track of where the turtle is)
                     #temp = self.penPtr
                     self.penPtr = random.choice(list(n for n in range(0, len(TURTLE_PEN_COLOURS)) if n != self.penPtr))
-                    #while self.penPtr == temp:
-                        #self.penPtr = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
-                    screenBuffer[i][2] = self.penPtr
+                    if TURTLE_USES_FULL_COLOUR_RANGE:
+                        screenBuffer[i][2] = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+                    else:
+                        screenBuffer[i][2] = TURTLE_PEN_COLOURS[self.penPtr]
                 elif self.changeColourOnCollisionMode == 2:
                     #temp = self.penPtr
                     #while self.penPtr == temp:
                         #self.penPtr = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
                     self.penPtr = random.choice(list(n for n in range(0, len(TURTLE_PEN_COLOURS)) if n != self.penPtr))
-                    screenBuffer[i][2] = self.penPtr
+                    if TURTLE_USES_FULL_COLOUR_RANGE:
+                        screenBuffer[i][2] = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+                    else:
+                        screenBuffer[i][2] = TURTLE_PEN_COLOURS[self.penPtr]
                 else:
                     screenBuffer[i][2] = data[2]
                 break
@@ -151,9 +190,12 @@ class Turtle:
                 self.hasDoneCurrentAction = True
                 #self.actionPtrPrev = self.actionPtr
                 if self.performRandom:
-                    action = [random.choice(["P", "N", "E", "S", "W"]), None]
+                    action = [random.choice(["P", "N", "E", "S", "W", "NE", "SE", "SW", "NW"]), None]
                     if action[0] == "P":
-                        action[1] = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                        if TURTLE_USES_FULL_COLOUR_RANGE:
+                            action[1] = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+                        else:
+                            action[1] = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
                     else:
                         action[1] = random.randint(0, TURTLE_RANDOM_DIST_MAX)
                 else:
@@ -161,31 +203,63 @@ class Turtle:
                 #print(action)
                 command = action[0]
                 if len(action) > 1:
-                    value = int(action[1])
+                    if isinstance(action[1], tuple):
+                        value = action[1]
+                    else:
+                        value = int(action[1])
                 #print(action)
 
                 self.target = None
+                self.direction = None
                     
                 if command == "P":
-                    self.penPtr = value
+                    if TURTLE_USES_FULL_COLOUR_RANGE:
+                        self.rgb = value
+                    else:
+                        self.penPtr = value
                 elif command == "D":
                     self.penDown = True
                     # need to add this point to memory because my program design is flawed :)
                     # it makes sense to "mark the paper" when the pen goes down anyway
-                    self.remember([self.x, self.y, self.penPtr])
+                    if TURTLE_USES_FULL_COLOUR_RANGE:
+                        self.remember([self.x, self.y, self.rgb])
+                    else:
+                        self.remember([self.x, self.y, TURTLE_PEN_COLOURS[self.penPtr]])
                 elif command == "U":
                     self.penDown = False
                 elif command == "N":
                     # turtle shouldn't have any awareness of its size
                     # but again my program design is flawed
-                    self.target = (self.x, self.y - value * self.size)
+                    #self.target = (self.x, self.y - value * self.size)
+                    self.direction = NORTH_ANGLE
+                elif command == "NE":
+                    self.direction = NORTH_ANGLE + 45
                 elif command == "E":
-                    self.target = (self.x + value * self.size, self.y)
+                    #self.target = (self.x + value * self.size, self.y)
+                    self.direction = NORTH_ANGLE + 90
+                elif command == "SE":
+                    self.direction = NORTH_ANGLE + 135
                 elif command == "S":
-                    self.target = (self.x, self.y + value * self.size)
+                    #self.target = (self.x, self.y + value * self.size)
+                    self.direction = NORTH_ANGLE + 180
+                elif command == "SW":
+                    self.direction = NORTH_ANGLE + 225
                 elif command == "W":
-                    self.target = (self.x - value * self.size, self.y)
+                    #self.target = (self.x - value * self.size, self.y)
+                    self.direction = NORTH_ANGLE + 270
+                elif command == "NW":
+                    self.direction = NORTH_ANGLE + 315
 
+                if self.direction != None:
+                    
+                    x2 = self.x + (value * math.sin(self.direction * TO_RAD) * self.size)
+                    y2 = self.y + (value * (math.cos(self.direction * TO_RAD * -1)) * self.size)
+                    
+                    x2 = round(x2 / self.size) * self.size
+                    y2 = round(y2 / self.size) * self.size
+                    
+                    self.target = (x2, y2)
+                    
                 if self.target == None:
                     self.actionPtr += 1
                     self.hasDoneCurrentAction = False
@@ -198,18 +272,29 @@ class Turtle:
                     self.y = self.target[1]
                 else:
                     # move towards target
+                    #print("hi")
+                    #print(self.x, self.y, self.direction, self.target)
+                    #print(self.size)
                     if abs(self.x - self.target[0]) >= abs(self.y - self.target[1]):
                         # move x
-                        if self.target[0] > self.x:
-                            self.x += 1 * self.moveSpeed
-                        elif self.target[0] < self.x:
-                            self.x -= 1 * self.moveSpeed
+                        sign = 1 if self.target[0] > self.x else -1 # if equal?
+                        diff = abs(self.x - self.target[0])
+                        if diff < self.moveSpeed:
+                            self.x += diff * sign
+                        else:
+                            self.x += self.moveSpeed * sign
+
                     else:
                         # move y
-                        if self.target[1] > self.y:
-                            self.y += 1 * self.moveSpeed
-                        elif self.target[1] < self.y:
-                            self.y -= 1 * self.moveSpeed
+                        sign = 1 if self.target[1] > self.y else -1 # if equal?
+                        diff = abs(self.y - self.target[1])
+                        if diff < self.moveSpeed:
+                            self.y += diff * sign
+                        else:
+                            self.y += self.moveSpeed * sign
+
+                    #self.x = int(self.x)
+                    #self.y = int(self.y)
 
                 offScreen = False
                 if self.x < 0:
@@ -234,7 +319,10 @@ class Turtle:
                 #print(self.x, self.y)
                         
                 if self.penDown:
-                    self.remember([self.x, self.y, self.penPtr])
+                    if TURTLE_USES_FULL_COLOUR_RANGE:
+                        self.remember([self.x, self.y, self.rgb])
+                    else:
+                        self.remember([self.x, self.y, TURTLE_PEN_COLOURS[self.penPtr]])
                     
                 if (self.x, self.y) == self.target:
                     self.actionPtr += 1
@@ -268,7 +356,7 @@ def display():
 
         #for t in turtles:
         for element in screenBuffer:
-            pygame.draw.rect(screen, TURTLE_PEN_COLOURS[element[2]], (element[0], element[1], TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
+            pygame.draw.rect(screen, element[2], (element[0], element[1], TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
             #pygame.draw.circle(screen, TURTLE_PEN_COLOURS[element[2]], (element[0], element[1]), TURTLE_SIZE_DEFAULT)
 
         pygame.display.update()
@@ -326,13 +414,14 @@ frameRate = 120
 turtles = []
 screenBuffer = []
 options = [
-    "Perform a specific TurtleScript file",
-    "Perform all TurtleScript files in the current directory (simultaneously)",
-    "Generate a random TurtleScript file",
-    "Endless random turtle",
-    "Set frame-rate",
-    "Set turtle size",
-    "Quit"
+    ("Perform a specific TurtleScript file", "readone"),
+    ("Perform all TurtleScript files in the current directory (simultaneously)", "readall"),
+    ("Generate a random TurtleScript file", "genrand"),
+    ("Endless random turtle", "endless"),
+    ("Set frame-rate", "setfps"),
+    ("Set turtle size", "setsize"),
+    ("Set turtle speed", "setspeed"),
+    ("Quit", "quit")
 ]
 
 screen = None
@@ -342,14 +431,15 @@ start = False
 print("Welcome to TurtleScript Drawing Program!")
 print("\nWhat would you like to do?")
 for i in range(len(options)):
-    print(i+1, ")", options[i])
+    print(i+1, ")", options[i][0])
 
 while not quitGame:
     start = True
     choice = waitForValidIntInput("Choose an option: ")
         
     if choice != None and choice in list(range(1, len(options) + 1)):
-        if choice == 1:
+        optId = options[choice-1][1]
+        if optId == "readone":
             print("\nAvailable TurtleScript files:")
             for fileName in os.listdir(os.path.abspath("")):
                 if fileName.endswith(".tsf"):
@@ -363,13 +453,13 @@ while not quitGame:
                 else:
                     turtles.append(Turtle(fileName))
 
-        elif choice == 2:
+        elif optId == "readall":
             fileNames = os.listdir(os.path.abspath(""))
             for fileName in fileNames:
                 if fileName.endswith(".tsf"): 
                     turtles.append(Turtle(fileName))
 
-        elif choice == 3:
+        elif optId == "genrand":
             numActions = waitForValidIntInput("How many actions?: ")
             if numActions <= 0:
                 print("error: please enter a positive number")
@@ -377,7 +467,7 @@ while not quitGame:
                 genFile = _generateTurtleScriptFile(numActions)
                 turtles = [Turtle(genFile),]
 
-        elif choice == 4:
+        elif optId == "endless":
             turtles = [Turtle(), ]
             changeColourOnCollision = None
             while changeColourOnCollision == None:
@@ -396,16 +486,19 @@ while not quitGame:
                     else:
                         turtles[0].changeColourOnCollisionMode = mode
 
-        elif choice == 5:
+        elif optId == "setfps":
             # set fps
             frameRate = waitForValidIntInput("Frame-rate: ", forcePositive=True)
             start = False
-        elif choice == 6:
+        elif optId == "setsize":
             # set size
             TURTLE_SIZE_DEFAULT = waitForValidIntInput("Turtle size: ", forcePositive=True)
             #TURTLE_MOVE_SPEED_DEFAULT = TURTLE_SIZE_DEFAULT
             start = False
-        elif choice == 7:
+        elif optId == "setspeed":
+            TURTLE_MOVE_SPEED_DEFAULT = waitForValidIntInput("Turtle speed: ", forcePositive=True)
+            start = False
+        elif optId == "quit":
             pygame.quit()
             #sys.exit()
             quitGame = True
