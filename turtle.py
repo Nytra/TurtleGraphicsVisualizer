@@ -24,8 +24,9 @@ TURTLE_SIZE_DEFAULT = 10
 TURTLE_MOVE_SPEED_DEFAULT = 10
 TURTLE_PERFORM_CURRENT_DIRECTORY = True # perform all TurtleScript files in the current (relative) directory
 TURTLE_RANDOM_DIST_MAX = 10
-TURTLE_CAN_OVERLAP_TRAIL = False
+TURTLE_CAN_OVERLAP_TRAIL = True
 TURTLE_USES_FULL_COLOUR_RANGE = True
+TURTLE_USES_FULL_DIRECTION_RANGE = True
 NORTH_ANGLE = 0
 TO_RAD = 3.14 / 180.0
 
@@ -49,10 +50,11 @@ class Turtle:
         self.path = path
         self.actions = []
         self.actionPtr = 0
-        self.x = SCREEN_WIDTH//2
-        self.y = SCREEN_HEIGHT//2
+        
         self.size = TURTLE_SIZE_DEFAULT
         self.moveSpeed = TURTLE_MOVE_SPEED_DEFAULT
+        self.x = random.randint(0, int(SCREEN_WIDTH / self.size) - 1) * self.size
+        self.y = random.randint(0, int(SCREEN_HEIGHT / self.size) - 1) * self.size
         self.penDown = False
         self.penPtr = 0 # pen 1 = red, pen 2 = green, pen 3 = blue
         self.rgb = TURTLE_PEN_COLOURS[self.penPtr]
@@ -251,9 +253,12 @@ class Turtle:
                     self.direction = NORTH_ANGLE + 315
 
                 if self.direction != None:
+
+                    if TURTLE_USES_FULL_DIRECTION_RANGE:
+                        self.direction = random.randint(0, 359)
                     
                     x2 = self.x + (value * math.sin(self.direction * TO_RAD) * self.size)
-                    y2 = self.y + (value * (math.cos(self.direction * TO_RAD * -1)) * self.size)
+                    y2 = self.y + (value * (math.cos(self.direction * TO_RAD) * -1) * self.size)
                     
                     x2 = round(x2 / self.size) * self.size
                     y2 = round(y2 / self.size) * self.size
@@ -275,6 +280,8 @@ class Turtle:
                     #print("hi")
                     #print(self.x, self.y, self.direction, self.target)
                     #print(self.size)
+                    prevx = self.x
+                    prevy = self.y
                     if abs(self.x - self.target[0]) >= abs(self.y - self.target[1]):
                         # move x
                         sign = 1 if self.target[0] > self.x else -1 # if equal?
@@ -293,8 +300,13 @@ class Turtle:
                         else:
                             self.y += self.moveSpeed * sign
 
-                    #self.x = int(self.x)
-                    #self.y = int(self.y)
+                    if [self.x, self.y] in list(cell[:2] for cell in screenBuffer) and TURTLE_CAN_OVERLAP_TRAIL == False:
+                        #print(screenBuffer[0][:2])
+                        self.x = prevx
+                        self.y = prevy
+                        self.actionPtr += 1
+                        self.hasDoneCurrentAction = False
+                        self.doNext()
 
                 offScreen = False
                 if self.x < 0:
@@ -364,6 +376,7 @@ def display():
         clock.tick(frameRate)
 
     pygame.quit()
+    #sys.exit()
     #screen.quit()
     #screen.close()
 
@@ -468,7 +481,14 @@ while not quitGame:
                 turtles = [Turtle(genFile),]
 
         elif optId == "endless":
-            turtles = [Turtle(), ]
+            #turtles = [Turtle(), ]
+            turtles = []
+            
+            numTurtles = waitForValidIntInput("Number of turtles: ", forcePositive=True)
+
+            for i in range(numTurtles):
+                turtles.append(Turtle())
+
             changeColourOnCollision = None
             while changeColourOnCollision == None:
                 changeColourOnCollision = input("Would you like the turtle to change colour when passing over its trail? [Y/n]: ")
@@ -484,7 +504,11 @@ while not quitGame:
                         print("error: not an option")
                         mode = None
                     else:
-                        turtles[0].changeColourOnCollisionMode = mode
+                        #turtles = []
+                        for i in range(numTurtles):
+                            #turtles.append(Turtle())
+                            turtles[i].changeColourOnCollisionMode = mode
+                        #turtles[0].changeColourOnCollisionMode = mode
 
         elif optId == "setfps":
             # set fps
@@ -510,3 +534,5 @@ while not quitGame:
         screenBuffer = []
 
         display()
+    
+    #quitGame = True
