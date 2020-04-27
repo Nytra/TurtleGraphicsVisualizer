@@ -5,6 +5,8 @@ A parser and renderer that reads TurtleScript commands from a TurtleScript file 
 
 Massively optimized rendering to support 1000 unique turtles moving on the screen at once!
 
+![demo5](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo5.gif)
+
 ![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.png)
 
 The program is capable of generating random TurtleScript files with a specified number of actions. The program ensures that the turtle does not leave the confines of the screen.
