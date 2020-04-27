@@ -1,5 +1,5 @@
 # TurtleScript - A turtle graphics visualizer
-A script parser, script generator, command interpreter and visualizer for turtle graphics. It can read from a file or generate commands on-the-fly. Requires PyGame.
+A script parser, script generator, command interpreter and visualizer for turtle graphics. It can read from a file or generate commands on-the-fly. Requires PyGame if you want to run it from source. 
 
 ![Insanity](https://github.com/Nytra/TurtleScript/blob/master/assets/demo3.gif)
 
