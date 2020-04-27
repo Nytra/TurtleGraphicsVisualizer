@@ -1,9 +1,15 @@
 # TurtleScript - A turtle graphics visualizer
-A parser and renderer that reads TurtleScript commands from a TurtleScript file (.tsf) and then performs the specified actions on screen. Also has modes that don't read from a file. Requires PyGame.
+A script parser, script generator, command interpreter and visualizer for turtle graphics. It can read from a file or generate commands on-the-fly. Requires PyGame if you want to run it from source. 
 
 ![Insanity](https://github.com/Nytra/TurtleScript/blob/master/assets/demo3.gif)
 
 Massively optimized rendering to support 1000 unique turtles moving on the screen at once!
+
+![demo5](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo5.gif)
+
+![demo6](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo6.gif)
+
+![demo4](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo4.gif)
 
 ![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.png)
 
@@ -62,18 +68,18 @@ The parser supports comments, but only at the end of the line.
 
 Example: `"N 4 # this is a comment"`
 
-The `"P"` command sets the colour, and takes a value in the range 0 through 2. This corresponds to Red, Green or Blue. 
+The `"P"` command sets the colour, and takes RGB values in this form: `"P 255 255 255"`
 
 The following TurtleScript code will draw a hollow square on screen.
 
 ```
 # start of file
-P 0    # select red pen
-D      # pen down
-W 5    # go west (left) 5 positions
-N 5    # go north (up) 5 positions
-E 5    # go east (right) 5 positions
-S 5    # go south (down) 5 positions
-U      # pen up
+P 255 0 0    # select red pen
+D       # pen down
+W 5     # go west (left) 5 positions
+N 5     # go north (up) 5 positions
+E 5     # go east (right) 5 positions
+S 5     # go south (down) 5 positions
+U       # pen up
 # end of file
 ```
