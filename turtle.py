@@ -27,11 +27,12 @@ TURTLE_RANDOM_DIST_MAX = 10
 TURTLE_CAN_OVERLAP_TRAIL = True
 TURTLE_USES_FULL_COLOUR_RANGE = True
 TURTLE_USES_FULL_DIRECTION_RANGE = False
-TURTLE_GO_DIAGONAL = False
+TURTLE_GO_DIAGONAL = True
 TURTLE_NO_TRAIL = False
+TURTLE_CHECK_NEIGHBOURS = False # began to implement Conway's Game of Life but decided it was out of the scope of this project
 RENDER_STATIC = True # don't clear the screen every frame, don't fill the screen every frame, only draw when needed
 RENDER_STATIC_CLEAR_INTERVAL = 1000 # MS
-RENDER_STATIC_DOES_CLEAR = False # Clear screen on intervals to limit trail length
+RENDER_STATIC_CLEAR = False # Clear screen on intervals to limit trail length
 NORTH_ANGLE = 0
 TO_RAD = 3.14 / 180.0
 
@@ -50,6 +51,8 @@ TO_RAD = 3.14 / 180.0
 # add option to not go back on itself (in random mode)
 # limit trail length
 
+# game of life. algorithm for getting number of neighbouring turtles
+
 class Turtle:
     
     def __init__(self, path=None):
@@ -61,8 +64,12 @@ class Turtle:
         self.moveSpeed = TURTLE_MOVE_SPEED_DEFAULT
         #self.x = random.randint(0, int(SCREEN_WIDTH / self.size) - 1) * self.size
         #self.y = random.randint(0, int(SCREEN_HEIGHT / self.size) - 1) * self.size
-        self.x = random.randint(0, getHCells() - 1)
-        self.y = random.randint(0, getVCells() - 1)
+        if TURTLE_CHECK_NEIGHBOURS:
+            self.x = random.randint(SCREEN_WIDTH // 2 - 10, SCREEN_WIDTH // 2 + 10)
+            self.y = random.randint(SCREEN_HEIGHT // 2 - 10, SCREEN_HEIGHT // 2 + 10)
+        else:
+            self.x = random.randint(0, getHCells() - 1)
+            self.y = random.randint(0, getVCells() - 1)
         self.penDown = False
         self.penPtr = 0 # pen 1 = red, pen 2 = green, pen 3 = blue
         self.rgb = TURTLE_PEN_COLOURS[self.penPtr]
@@ -71,6 +78,7 @@ class Turtle:
         self.hasDoneCurrentAction = False
         self.changeColourOnCollisionMode = 0 # 0 = off, 1 = when crossing same colour, 2 = when crossing any colour
         self.currentDirection = 0 # 360 deg value
+        self.alive = True
 
         if self.path != None:
             self.readScript(path)
@@ -173,6 +181,20 @@ class Turtle:
 
                 self.actions.append(parts)
     
+    def getNeighbours(self):
+        radius = 1
+        num = 0
+
+        for t in turtles:
+            if t.x in tuple(range(self.x - 1, self.x + 2)) and\
+                 t.y in tuple(range(self.y - 1, self.y + 2)):
+                num += 1
+                
+                    #if t.x == x and t.y == y:
+                        #num += 1
+        
+        return num
+    
     def remember(self, data):
         exists = False
 
@@ -235,7 +257,7 @@ class Turtle:
 
     def doNext(self):
         
-        if self.actionPtr < len(self.actions) or self.performRandom == True:
+        if (self.actionPtr < len(self.actions) or self.performRandom == True) or (self.alive and TURTLE_CHECK_NEIGHBOURS):
             if self.hasDoneCurrentAction == False:
                 self.hasDoneCurrentAction = True
                 #self.actionPtrPrev = self.actionPtr
@@ -394,6 +416,9 @@ class Turtle:
                         self.actionPtr += 1
                         self.hasDoneCurrentAction = False
                         self.doNext()
+                
+                if self.getNeighbours() != 3:
+                    self.alive = False
                         
                 if self.penDown:
                     if TURTLE_USES_FULL_COLOUR_RANGE:
@@ -405,6 +430,9 @@ class Turtle:
                     self.actionPtr += 1
                     self.hasDoneCurrentAction = False
                     self.doNext()
+        else:
+            if self.getNeighbours() == 3:
+                self.alive = True
             
 def getCell(x, y):
     #print((y * SCREEN_WIDTH) + x, len(screenBuffer))
@@ -474,7 +502,7 @@ def display():
         hasDoneInitialPause = True
 
         # maybe don't clear the screen to get better performance?
-        if not RENDER_STATIC or (RENDER_STATIC and RENDER_STATIC_DOES_CLEAR and\
+        if not RENDER_STATIC or (RENDER_STATIC and RENDER_STATIC_CLEAR and\
              (pygame.time.get_ticks() - clearTimer) > RENDER_STATIC_CLEAR_INTERVAL):
             clearTimer = pygame.time.get_ticks()
             screen.fill(BG_COLOUR)
@@ -494,7 +522,8 @@ def display():
                             pygame.draw.rect(screen, getCell(x, y), (x * TURTLE_SIZE_DEFAULT, y * TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
             else:
                 for t in turtles:
-                    pygame.draw.rect(screen, t.rgb, (t.x * TURTLE_SIZE_DEFAULT, t.y * TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
+                    if t.alive == True:
+                        pygame.draw.rect(screen, t.rgb, (t.x * TURTLE_SIZE_DEFAULT, t.y * TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
 
         #for element in screenBuffer:
             #pygame.draw.rect(screen, element[2], (element[0], element[1], TURTLE_SIZE_DEFAULT, TURTLE_SIZE_DEFAULT))
@@ -698,5 +727,3 @@ while not quitGame:
         clearScreenBuffer()
 
         display()
-    
-    #quitGame = True
