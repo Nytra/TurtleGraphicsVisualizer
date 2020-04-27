@@ -16,8 +16,8 @@ GREEN = 0, 255, 0
 BLUE = 0, 0, 255
 BG_COLOUR = GREY
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1366 
+SCREEN_HEIGHT = 768
 TURTLE_ACTION_INTERVAL = 0 # time in ms between actions
 TURTLE_PEN_COLOURS = RED, GREEN, BLUE
 TURTLE_SIZE_DEFAULT = 10
@@ -30,9 +30,10 @@ TURTLE_USES_FULL_DIRECTION_RANGE = False
 TURTLE_GO_DIAGONAL = True
 TURTLE_NO_TRAIL = False
 TURTLE_CHECK_NEIGHBOURS = False # began to implement Conway's Game of Life but decided it was out of the scope of this project
+TURTLE_NEVER_CHANGE_COLOUR = True
 RENDER_STATIC = True # don't clear the screen every frame, don't fill the screen every frame, only draw when needed
 RENDER_STATIC_CLEAR_INTERVAL = 1000 # MS
-RENDER_STATIC_CLEAR = False # Clear screen on intervals to limit trail length
+RENDER_STATIC_CLEAR_ON_INTERVAL = False # Clear screen on intervals to limit trail length
 NORTH_ANGLE = 0
 TO_RAD = 3.14 / 180.0
 
@@ -79,6 +80,8 @@ class Turtle:
         self.changeColourOnCollisionMode = 0 # 0 = off, 1 = when crossing same colour, 2 = when crossing any colour
         self.currentDirection = 0 # 360 deg value
         self.alive = True
+        self.initColour = getRandomColour()
+        self.hasStarted = False
 
         if self.path != None:
             self.readScript(path)
@@ -267,10 +270,16 @@ class Turtle:
                     else:
                         action = [random.choice(["P", "N", "E", "S", "W"]), None]
                     if action[0] == "P":
-                        if TURTLE_USES_FULL_COLOUR_RANGE:
-                            action[1] = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+                        if TURTLE_NEVER_CHANGE_COLOUR == False:
+                            if TURTLE_USES_FULL_COLOUR_RANGE:
+                                if self.hasStarted == False:
+                                    action[1] = self.initColour
+                                else:
+                                    action[1] = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+                            else:
+                                action[1] = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
                         else:
-                            action[1] = random.randint(0, len(TURTLE_PEN_COLOURS) - 1)
+                            action[1] = self.initColour
                     else:
                         action[1] = random.randint(0, TURTLE_RANDOM_DIST_MAX)
                 else:
@@ -417,8 +426,9 @@ class Turtle:
                         self.hasDoneCurrentAction = False
                         self.doNext()
                 
-                if self.getNeighbours() != 3:
-                    self.alive = False
+                if TURTLE_CHECK_NEIGHBOURS:
+                    if self.getNeighbours() != 3:
+                        self.alive = False
                         
                 if self.penDown:
                     if TURTLE_USES_FULL_COLOUR_RANGE:
@@ -430,9 +440,11 @@ class Turtle:
                     self.actionPtr += 1
                     self.hasDoneCurrentAction = False
                     self.doNext()
-        else:
+        elif TURTLE_CHECK_NEIGHBOURS:
             if self.getNeighbours() == 3:
                 self.alive = True
+        
+        self.hasStarted = True
             
 def getCell(x, y):
     #print((y * SCREEN_WIDTH) + x, len(screenBuffer))
@@ -502,7 +514,7 @@ def display():
         hasDoneInitialPause = True
 
         # maybe don't clear the screen to get better performance?
-        if not RENDER_STATIC or (RENDER_STATIC and RENDER_STATIC_CLEAR and\
+        if not RENDER_STATIC or (RENDER_STATIC and RENDER_STATIC_CLEAR_ON_INTERVAL and\
              (pygame.time.get_ticks() - clearTimer) > RENDER_STATIC_CLEAR_INTERVAL):
             clearTimer = pygame.time.get_ticks()
             screen.fill(BG_COLOUR)
@@ -607,7 +619,7 @@ def clearScreenBuffer():
             screenBuffer.append(BG_COLOUR)
 
 
-flags = HWSURFACE | DOUBLEBUF
+flags = HWSURFACE | DOUBLEBUF | FULLSCREEN
 bpp = 16
 
 clock = pygame.time.Clock()
