@@ -7,6 +7,8 @@ Massively optimized rendering to support 1000 unique turtles moving on the scree
 
 ![demo5](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo5.gif)
 
+![demo6](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo6.gif)
+
 ![demo4](https://github.com/Nytra/TurtleGraphicsVisualizer/blob/master/assets/demo4.gif)
 
 ![Random TurtleScript](https://github.com/Nytra/TurtleScript/blob/master/assets/random.png)
