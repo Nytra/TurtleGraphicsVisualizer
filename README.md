@@ -37,7 +37,7 @@ The idea for this program came from a book called "The Pragmatic Programmer" by 
 
 The exercise just states that you must implement a *parser* for the scripting language- but, of course, I couldn't just stop there. 
 
-This program supports ~~3 colours~~ FULL COLOUR RANGE, navigation in ~~4~~ FULL 360 DEGREES ~~directions~~, and pen up/down commands. You could draw anything from your wildest imagination.
+This program supports ~~3 colours~~ FULL COLOUR RANGE, navigation in ~~four~~ FULL 360 DEGREES ~~directions~~, and pen up/down commands. You could draw anything from your wildest imagination.
 
 ---
 
